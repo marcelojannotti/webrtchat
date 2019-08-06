@@ -32,7 +32,7 @@ function chatClient (element) {
         answerDescr = answer;
         return ansConn.setLocalDescription(answer);
       });
-    } catch (e) { throw(e);this.disconnect(); return this.started = false ;}
+    } catch (e) { this.disconnect(); return this.started = false ;}
     return this.started = true;
   };
   

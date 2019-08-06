@@ -12,9 +12,9 @@ function chatServer (element) {
         elcopy.focus(); elcopy.select(); document.execCommand('copy');
         elcopy.parentNode.removeChild(elcopy);
         console.log('(Copied to ClipBoard) You server code is:\n'+oChat.connStr);
-        oChat.connStr = prompt('Inform a Client code');
+/*        oChat.connStr = prompt('Inform a Client code');
         offerPeer.setRemoteDescription(new RTCSessionDescription(answerDescr));
-        offerPeer.addIceCandidate(answerCand);
+        offerPeer.addIceCandidate(answerCand);*/
 
     }
   };
@@ -35,7 +35,7 @@ function chatServer (element) {
         offerDescr = offer;
         return offerPeer.setLocalDescription(offer);
       });
-  } catch (e) { throw(e); this.disconnect(); return this.started = false; }
+  } catch (e) { this.disconnect(); return this.started = false; }
     return this.started = true;
   };
   
@@ -66,6 +66,12 @@ function chatServer (element) {
   Object.defineProperty(this,'server',{value: true,writeble: false});
   
   this.send = function(text) {
+    if ((/^\/key\s.+/).test(text)) {
+      oChat.connStr = text.replace(/^\/key\s/,'');
+      offerPeer.setRemoteDescription(new RTCSessionDescription(answerDescr));
+      offerPeer.addIceCandidate(answerCand);
+      return;
+    }
     text = text+'\n';
     channel.send(text);
     if (element) element.innerHTML += '['+new Date(Date.now()).toLocaleDateString('pt-BR')+'] '+text;
