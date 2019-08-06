@@ -1,0 +1,27 @@
+<html>
+	<head>
+		<title>Simple messenger P2P</title>
+		<script src="client.js"></script>
+		<script src="server.js"></script>
+		<script>
+		  window.onload = function() {
+		    elChat = document.getElementById('chat');
+		    oChat = new chatServer(elChat);
+		  }
+		  function connectButton(element) {
+  		  if (!oChat.started) oChat.connect();
+  		  else oChat.disconnect();
+		    console.log(oChat);
+  		  element.innerHTML = (oChat.started?'Disconnect':'Connect');
+		  }
+		</script>
+	</head>
+	<body style="width:100%;margin:auto">
+	  <div>
+	  <div>I'm a <input type="radio" checked id="server" name="mode" onclick="if(!oChat.server){if(oChat.started)document.getElementById(condis).click(); oChat = new chatServer(elChat);}"/><label for="server">Server</label> <input type="radio" id="client" name="mode" onclick="if(oChat.server){if(oChat.started)document.getElementById(condis).click(); oChat = new chatClient(elChat);}"/><label for="client">Client</label></div>
+	  <div><button id="condis" onclick="connectButton(this)">Connect</button></div>
+	  <div><textarea id="chat" style="width:100%"></textarea></div>
+	  <div><form onsubmit="oChat.send(this.children[0].value)"><input type="text" style="width:100%"/></div>
+	  </div>
+	</body>
+</html>
