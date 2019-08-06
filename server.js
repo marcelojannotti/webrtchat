@@ -11,25 +11,26 @@ function chatServer (element) {
         elcopy.value = oChat.connStr; document.body.appendChild(elcopy);
         elcopy.focus(); elcopy.select(); document.execCommand('copy');
         elcopy.parentNode.removeChild(elcopy);
-        alert('(Copied to ClipBoard) You server code is:\n'+oChat.connStr);
+        console.log('(Copied to ClipBoard) You server code is:\n'+oChat.connStr);
         oChat.connStr = prompt('Inform a Client code');
-        offerPeer.addIceCandidate(answerDescr);
         offerPeer.setRemoteDescription(new RTCSessionDescription(answerDescr));
+        offerPeer.addIceCandidate(answerCand);
+
     }
   };
   
   channel = offerPeer.createDataChannel('chat');
   channel.onmessage = function (event) {
-    if (element) element.innerHTML += '['+Date.now().toLocaleDateString('pt-BR')+'] '+event.data;
-    else console.log('['+Date.now().toLocaleDateString('pt-BR')+'] '+event.data);
+    if (element) element.innerHTML += '['+new Date(Date.now()).toLocaleDateString('pt-BR')+'] '+event.data;
+    else console.log('['+new Date(Date.now()).toLocaleDateString('pt-BR')+'] '+event.data);
   };
   channel.onopen = function(event) {
-    channel.send('Connected!');
+    oChat.send('Connected!');
   };
+  
   
   this.connect = function () {
     try {
-
       offerPeer.createOffer().then(function (offer) {
         offerDescr = offer;
         return offerPeer.setLocalDescription(offer);
@@ -46,13 +47,15 @@ function chatServer (element) {
   
   Object.defineProperty(this,'connStr',{
     get: function() {
-      console.log(atob(btoa(JSON.stringify({handshake:[offerDescr,offerCand]}))));
-      return btoa(JSON.stringify({handshake:[offerDescr,offerCand]}));
+//      return btoa(JSON.stringify({handshake:[offerDescr.toJSON(),offerCand.toJSON()]}));
+      return btoa(JSON.stringify({handshake:[{type: offerDescr.type,sdp: btoa(offerDescr.sdp)},{candidate: btoa(offerCand.candidate),sdpMid: (offerCand.sdpMid?offerCand.sdpMid:"0"),sdpMLineIndex: (offerCand.sdpMLineIndex?offerCand.sdpMLineIndex:0)}]}));
       
     },
     set: function (newValue) {
       try {
         newValue = JSON.parse(atob(newValue));
+        newValue.handshake[0].sdp = atob(newValue.handshake[0].sdp);
+        newValue.handshake[1].candidate = atob(newValue.handshake[1].candidate);
         answerDescr = newValue.handshake[0];
         answerCand = newValue.handshake[1];
       } catch(e) {throw('Connection string invalid.');}
@@ -62,5 +65,10 @@ function chatServer (element) {
   
   Object.defineProperty(this,'server',{value: true,writeble: false});
   
-  this.send = function(text) { channel.send(text); };
+  this.send = function(text) {
+    text = text+'\n';
+    channel.send(text);
+    if (element) element.innerHTML += '['+new Date(Date.now()).toLocaleDateString('pt-BR')+'] '+text;
+    else console.log('['+new Date(Date.now()).toLocaleDateString('pt-BR')+'] '+text);
+  };
 };

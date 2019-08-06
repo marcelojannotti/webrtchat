@@ -11,7 +11,6 @@
 		  function connectButton(element) {
   		  if (!oChat.started) oChat.connect();
   		  else oChat.disconnect();
-		    console.log(oChat);
   		  element.innerHTML = (oChat.started?'Disconnect':'Connect');
 		  }
 		</script>
@@ -21,7 +20,7 @@
 	  <div>I'm a <input type="radio" checked id="server" name="mode" onclick="if(!oChat.server){if(oChat.started)document.getElementById(condis).click(); oChat = new chatServer(elChat);}"/><label for="server">Server</label> <input type="radio" id="client" name="mode" onclick="if(oChat.server){if(oChat.started)document.getElementById(condis).click(); oChat = new chatClient(elChat);}"/><label for="client">Client</label></div>
 	  <div><button id="condis" onclick="connectButton(this)">Connect</button></div>
 	  <div><textarea id="chat" style="width:100%"></textarea></div>
-	  <div><form onsubmit="oChat.send(this.children[0].value)"><input type="text" style="width:100%"/></div>
+	  <div><form onsubmit="try{oChat.send(this.children[0].value);}catch(e){};this.reset();return false;"><input type="text" style="width:100%"/></div>
 	  </div>
 	</body>
 </html>
